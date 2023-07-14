@@ -7,49 +7,49 @@ class AlbumsHandler {
     }
 
     async postAlbumHandler(request, h) {
-            this._validator.validateAlbumPayloads(request.payload)
-            const { name, year } = request.payload
-            const albumId = await this._service.addAlbum({ name, year })
-            const response = h.response({
-                status: 'success',
-                message: 'album is successfully added',
-                data: {
-                    albumId,
-                },
-            })
-            response.code(201)
-            return response
-        } 
- 
-    async getAlbumByIdHandler(request, h) {
-            const {id} = request.params
-            const album = await this._service.getAlbumById(id)
-            return {
-                status: 'success',
-                data: {
-                    album
-                }
-            }
-        } 
+        this._validator.validateAlbumPayloads(request.payload)
+        const {name, year} = request.payload
+        const albumId = await this._service.addAlbum({name, year})
+        const response = h.response({
+            status: 'success',
+            message: 'album is successfully added',
+            data: {
+                albumId,
+            },
+        })
+        response.code(201)
+        return response
+    }
 
-    async putAlbumByIdHandler(request, h) {
-            this._validator.validateAlbumPayloads(request.payload)
-            const {id} = request.params
-            await this._service.editAlbumById(id, request.payload) 
-            return {
-                status: 'success',
-                message: 'album is successfully updated'
-            }
-        } 
+    async getAlbumByIdHandler(request) {
+        const {id} = request.params
+        const album = await this._service.getAlbumById(id)
+        return {
+            status: 'success',
+            data: {
+                album,
+            },
+        }
+    }
 
-    async deleteAlbumByIdHandler(request, h) {
-          const {id} = request.params
-          await this._service.deleteAlbumById(id)
-          return {
-              status: 'success',
-              message: 'album is successfully deleted'
-          }
-      } 
+    async putAlbumByIdHandler(request) {
+        this._validator.validateAlbumPayloads(request.payload)
+        const {id} = request.params
+        await this._service.editAlbumById(id, request.payload)
+        return {
+            status: 'success',
+            message: 'album is successfully updated',
+        }
+    }
+
+    async deleteAlbumByIdHandler(request) {
+        const {id} = request.params
+        await this._service.deleteAlbumById(id)
+        return {
+            status: 'success',
+            message: 'album is successfully deleted',
+        }
+    }
 }
 
-module.exports = { AlbumsHandler }
+module.exports = {AlbumsHandler}

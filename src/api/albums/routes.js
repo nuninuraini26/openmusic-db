@@ -20,5 +20,5 @@ const routes = (handler) => [
         handler: handler.deleteAlbumByIdHandler,
     },
 ]
-   
+
 module.exports = routes
