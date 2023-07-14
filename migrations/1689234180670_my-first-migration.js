@@ -15,7 +15,7 @@ exports.up = pgm => {
 		year: {
 			type: 'INT',
 			notNull: true
-		}
+		},
 	})
 	pgm.createTable('songs', {
 		id: {
@@ -40,11 +40,11 @@ exports.up = pgm => {
 		},
 		duration: {
 			type: 'INT',
-			notNull: true
+		
 		},
-		albumId: {
+		album_id: {
 			type: 'CHAR(22)',
-			notNull: true
+		
 		}
 	})
 }

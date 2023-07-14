@@ -1,4 +1,3 @@
-const mapdbtoalbums = ({id, name, year}) => ({id, name, year})
 const mapdbtosongs = ({
 	id,
 	title, 
@@ -6,17 +5,15 @@ const mapdbtosongs = ({
 	performer, 
 	genre, 
 	duration, 
-	albumId}) => ({
+	album_id}) => ({
 	id,
 	title, 
 	year, 
 	performer, 
 	genre, 
 	duration, 
-	albumId
+	albumId: album_id
 })
-
 module.exports = {
-	mapdbtoalbums,
 	mapdbtosongs
 }
