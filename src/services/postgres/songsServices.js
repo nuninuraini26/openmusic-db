@@ -2,7 +2,6 @@ const {Pool} = require('pg')
 const {nanoid} = require('nanoid')
 const InvariantError = require('../../exceptions/invariant-error')
 const NotFoundError = require('../../exceptions/notfound-error')
-const {mapdbtosongs} = require('../../utils')
 
 class SongsServices {
     constructor() {
@@ -10,7 +9,7 @@ class SongsServices {
     }
 
     async addSong({title, year, performer, genre, duration, albumId}) {
-        const id = 'song-'.concat(nanoid(16))
+        const id = `song-${nanoid(16)}`
         const query = {
             text: 'INSERT INTO songs VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id',
             values: [id, title, year, performer, genre, duration, albumId],
@@ -24,22 +23,37 @@ class SongsServices {
         return result.rows[0].id
     }
 
-    async getSongs(parameter) {
-        const query = {
-            text: 'SELECT id, title, performer FROM songs',
+    async getSongs(title, performer) {
+        if (title && performer) {
+            const query = {
+                text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
+                values: [`%${title}%`, `%${performer}%`],
+            }
+            const result = await this._pool.query(query)
+            return result.rows
         }
-        const result = await this._pool.query(query)
-        const songs = result.rows.map(mapdbtosongs)
-        let filtered = songs
-        if ('title' in parameter) {
-            filtered = filtered.filter((song) => song.title.toLowerCase().includes(parameter.title))
+    
+        if (title && !performer) {
+            const query = {
+                text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1',
+                values: [`%${title}%`],
+            }
+            const result = await this._pool.query(query)
+            return result.rows
         }
-        if ('performer' in parameter) {
-            filtered = filtered.filter((song) => song.performer.toLowerCase().includes(parameter.performer))
+    
+        if (!title && performer) {
+            const query = {
+                text: 'SELECT id, title, performer FROM songs WHERE performer ILIKE $1',
+                values: [`%${performer}%`],
+            }
+            const result = await this._pool.query(query)
+            return result.rows
         }
-        return filtered
+        const result = await this._pool.query('SELECT id, title, performer FROM songs')
+        return result.rows
     }
-
+    
     async getSongById(id) {
         const query = {
             text:
@@ -48,11 +62,11 @@ class SongsServices {
         }
         const result = await this._pool.query(query)
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('song is not found')
         }
 
-        return result.rows.map(mapdbtosongs)[0]
+        return result.rows[0]
     }
 
     async editSongById(id, {title, year, performer, genre, duration}) {
@@ -63,7 +77,7 @@ class SongsServices {
             [title, year, performer, genre, duration, id],
         }
         const result = await this._pool.query(query)
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('song is not found')
         }
     }
@@ -78,7 +92,7 @@ class SongsServices {
 
         const result = await this._pool.query(query)
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('song is not found')
         }
     }

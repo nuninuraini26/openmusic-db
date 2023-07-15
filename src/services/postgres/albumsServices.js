@@ -9,7 +9,7 @@ class AlbumsServices {
     }
 
     async addAlbum({name, year}) {
-        const id = 'album-'.concat(nanoid(16))
+        const id = `album-${nanoid(16)}`
         const query = {
             text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
             values:
@@ -34,7 +34,7 @@ class AlbumsServices {
         const result_album = await this._pool.query(album)
         const result_songs = await this._pool.query(songs)
 
-        if (!result_album.rows.length) {
+        if (!result_album.rowCount) {
             throw new NotFoundError('album is not found')
         }
         return {
@@ -53,7 +53,7 @@ class AlbumsServices {
             [name, year, id],
         }
         const result = await this._pool.query(query)
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('album is not found')
         }
     }
@@ -68,7 +68,7 @@ class AlbumsServices {
 
         const result = await this._pool.query(query)
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('album is not found')
         }
     }
